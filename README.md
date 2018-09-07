@@ -7,7 +7,7 @@ Inspired on the Ruby on Rails gem [Has Scope](https://github.com/plataformatec/h
 
 # Usage
 
-Let's imagine we have a `Book` model and we want to create filter them.
+Let's imagine we have a `Book` model and we want to create a filter for them.
 
 1. Create your controller and be sure to inherit from `Petrelli\ScopedController\BaseController`.
 
@@ -23,13 +23,13 @@ protected $scopes = [
 ];
 ```
 
-3. Define your $entity variable
+3. Define your `$entity` variable. Usually an Eloquent Model.
 
 ```php
 protected $entity = Book::class;
 ```
 
-4. Call your collection and get everything or paginate as you would normally do:
+4. Get the collection and perform the call. You can use any of the available functions for your chain. If using Eloquent, you could use `get()`, or `paginate(...)`.
 
 ```php
 $items = $this->collection()->get();
@@ -37,7 +37,9 @@ $items = $this->collection()->paginate(static::PER_PAGE);
 
 ```
 
-This setup will work as the following:
+## In action
+
+This setup will work the following way:
 
 ```
 # Get books filtered by year = 2018
@@ -55,7 +57,7 @@ This setup will work as the following:
 
 ## Redefine the chain
 
-If you want to be more specific where and how to start executing your scopes you can always redefine your `beginOfAssociationChain()` function.
+If you want to be more specific about where to execute your scopes you can always redefine  `beginOfAssociationChain()`.
 
 
 For example:
@@ -68,9 +70,9 @@ protected function beginOfAssociationChain()
     }
 ```
 
-Here your chain will always execute the `published()` scope before any element of the chain, and also will filter books showing only the ones at the NYC library.
+Here your chain will always execute before anything the `published()` scope, and also will filter books showing only the ones at the NYC library.
 
-Then of course just get or paginate as normal:
+Then of course just use `get` or `paginate` as usual:
 
 ```php
 $items = $this->collection()->get();
@@ -80,7 +82,7 @@ $items = $this->collection()->paginate(static::PER_PAGE);
 
 ## Applying scopes manually
 
-You can always apply all scopes manually to be more clear in your code:
+You can always apply all scopes manually if you want better control:
 
 ```php
 
@@ -94,7 +96,7 @@ public function index()
 
 ## Check if there's a filter present
 
-Usually for SEO you want to check if you have any filter present. We provide a simple function for this:
+Usually for SEO you want to check if you have any scope present. There's a very simple function for this:
 
 ```php
 
