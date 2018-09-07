@@ -1,0 +1,29 @@
+{
+    "name": "petrelli/scoped-controller",
+    "description": "Very simple controller that automatically call scopes based on URL parameters",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+      "A17",
+      "controller",
+      "filters",
+      "scoped",
+      "scopes"
+    ],
+    "authors": [
+        {
+            "name": "Fernando Petrelli",
+            "email": "contact@fernandopetrelli.com"
+        }
+    ],
+    "require": {
+      "php": "^7.0",
+      "laravel/framework": "5.6.*"
+    },
+    "autoload": {
+      "psr-4": {
+        "Petrelli\\ScopedController\\": "src/"
+      }
+    },
+    "minimum-stability": "stable"
+}
