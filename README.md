@@ -4,6 +4,22 @@ ScopedController is a Laravel package that will allows you to execute scopes ove
 
 Inspired on the Ruby on Rails gem [Has Scope](https://github.com/plataformatec/has_scope).
 
+# Install
+
+Just include it in your composer.json file
+
+```
+composer require petrelli/scoped-controller
+```
+
+Or add:
+
+```
+"petrelli/scoped-controller": "0.9.*"
+```
+
+And run `composer update`.
+
 
 # Usage
 
@@ -116,15 +132,16 @@ Let's take the following two controller actions:
 
 public function index()
 {
-    // Return Books triggering normal scopes
+    // Return Books triggering defined scopes
     $items = $this->collection()->get();
 }
 
 public function indexBestSellers()
 {
-    // Return Books triggering normal scopes plus bestSeller scope
+    // Return Books triggering defined scopes + bestSeller scope
     $items = $this->collection()->bestSeller()->get();
 }
+```
 
 
 # License
