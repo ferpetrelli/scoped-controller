@@ -65,9 +65,9 @@ For example:
 
 ```php
 protected function beginOfAssociationChain()
-    {
-        return Book::published()->where('library', 'NYC');
-    }
+{
+    return Book::published()->where('library', 'NYC');
+}
 ```
 
 Here your chain will always execute before anything the `published()` scope, and also will filter books showing only the ones at the NYC library.
@@ -88,9 +88,9 @@ You can always apply all scopes manually if you want better control:
 
 // Controller function
 public function index()
-    {
-        $items = $this->applyScopes(Book::query())->get();
-    }
+{
+    $items = $this->applyScopes(Book::query())->get();
+}
 
 ```
 
@@ -104,6 +104,27 @@ Usually for SEO you want to check if you have any scope present. There's a very 
 $this->hasAnyScope()
 
 ```
+
+## Use specific scopes for different actions
+
+As the result is a Query Builder, you could keep chaining methods and scopes as you would normally do with Eloquent.
+
+Let's take the following two controller actions:
+
+
+```php
+
+public function index()
+{
+    // Return Books triggering normal scopes
+    $items = $this->collection()->get();
+}
+
+public function indexBestSellers()
+{
+    // Return Books triggering normal scopes plus bestSeller scope
+    $items = $this->collection()->bestSeller()->get();
+}
 
 
 # License

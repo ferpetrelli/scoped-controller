@@ -44,10 +44,6 @@ class BaseController extends Controller
      *
      * [ parameter => scopeName, .... ]
      *
-     * Scopes should better be defined on each controller but given we use this
-     * on 3 places (general search, collections and artwork prev/next functionality)
-     * better to place them here to have a single control point
-     *
      */
     protected $scopes = [
     ];
