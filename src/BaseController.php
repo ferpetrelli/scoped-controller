@@ -108,7 +108,20 @@ class BaseController extends Controller
         if (!empty($this->scopes)) {
             foreach ($this->scopes as $parameter => $scope) {
                 if (request()->input($parameter) != null) {
-                    $query->$scope(request()->input($parameter));
+
+                    // If the scope is defined as an array, call the scope
+                    // passing all parameters in order
+                    if (is_array($scope)) {
+                        $scopeName       = $scope[0];
+                        $scopeParameters = collect($scope[1])->map(function($field) use ($parameter) {
+                            return request()->input($parameter)[$field];
+                        })->toArray();
+
+                        $query->$scopeName(...$scopeParameters);
+                    } else {
+                        $query->$scope(request()->input($parameter));
+                    }
+
                 }
             }
         }

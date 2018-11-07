@@ -71,6 +71,49 @@ This setup will work the following way:
 
 # Extra functionality
 
+## Scopes with multi-value parameters
+
+If you need to define a multi-value parameter just pass it as an array and define the scopes as the following:
+
+
+```php
+// Here as an example we have two scopes: year and author.
+// They will be called if we receive the parameters
+// byYear and byAuthor respectively.
+protected $scopes = [
+    'byYear'   => 'year',
+    'byAuthor' => 'author',
+    'sortBy'   => ['sort_by' ['field', 'direction']],
+];
+```
+
+Defining the scope as an array will allow you to pass multiple parameters to it coming from the URL as arrays.
+
+
+## In action
+
+
+```
+# Get books filtered by year = 2018 and sorted by author in alphabetical order
+/books?byYear=2018&sortBy['field']=author&sortBy['direction']=asc
+
+# Get books filtered by author = borges and sorted by date
+/books?byAuthor=borges&sortBy['field']=date&sortBy['direction']=desc
+```
+
+You get the idea. The scope is nothing but a simple two parameter element.
+
+```
+public function scopeSortBy($query, $value, $direction = 'asc')
+{
+    //...
+}
+```
+
+Of course you can generalize to use any number of parameters. Simply add it to the $scopes definition.
+
+
+
 ## Redefine the chain
 
 If you want to be more specific about where to execute your scopes you can always redefine  `beginOfAssociationChain()`.
