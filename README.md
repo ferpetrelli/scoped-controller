@@ -1,6 +1,6 @@
 # Scoped Controller
 
-Scoped Controller is a Laravel package that will allow you to cleanup your controllers by executing scopes dynamically over a collection, depending on which URL parameters are present.
+Scoped Controller is a very simple Laravel package (<80 LOC) that will allow you to build queries and cleanup your controllers by executing scopes based on request parameters.
 
 Inspired on the Ruby on Rails gem [Has Scope](https://github.com/plataformatec/has_scope).
 
@@ -21,9 +21,25 @@ Or add:
 And run `composer update`.
 
 
-# Usage
+# Basic Usage
 
-Imagine we have a `Book` model, and we want to use scopes as filters for a listing.
+Imagine we have a `Book` model with two filters, by year and by author.
+
+URL parameters might look like the following:
+
+```
+# Get books filtered by year == 2020
+/books?byYear=2020
+
+# Get books filtered by author == cortazar
+/books?byAuthor=cortazar
+
+# Get books filtered by year and author
+/books?byYear=1961&byAuthor=borges
+
+```
+
+## Steps
 
 1. Create your controller and be sure to inherit from `Petrelli\ScopedController\BaseController`.
 
@@ -61,21 +77,45 @@ $items = $this->collection()->paginate(static::PER_PAGE);
 
 ```
 
-## In action
+# Customizing the scopes chain
 
-Scopes will be triggered by URL presence.
+We provide a controller function named  `beginOfAssociationChain()` that you could overload.
+In there we build the base query over which we will apply all of our scopes.
+
+
+For example:
+
+
+```php
+protected function beginOfAssociationChain()
+{
+    return Book::published()->where('library', 'NYC');
+}
+```
+
+Here every time we call `$this->collection()` as previously described we will be executing the `published()` scope, and also filtering books where 'library' is 'NYC'.
+
+
+```php
+$items = $this->collection()->get();
+$items = $this->collection()->paginate(static::PER_PAGE);
 
 ```
-# Get books filtered by year == 2020
-/books?byYear=2020
 
-# Get books filtered by author == cortazar
-/books?byAuthor=cortazar
+# Applying scopes manually
 
-# Get books filtered by year and author
-/books?byYear=1961&byAuthor=borges
+We provide the function `applyScopes($query)` in case you want to manually apply your scopes to a query. As always, which scope will be triggered is a function of the request parameters.
+
+```php
+
+// Controller function
+public function index()
+{
+    $items = $this->applyScopes(Book::query())->get();
+}
 
 ```
+
 
 # Extra functionality
 
@@ -120,48 +160,6 @@ public function scopeSortBy($query, $value, $direction = 'asc')
 
 Of course you can generalize to use any number of parameters. Simply add it to the $scopes definition.
 
-
-
-# Customizing the scopes chain
-
-We provide a controller function named  `beginOfAssociationChain()` that you could overload.
-In there we basically apply all scopes into the `$entity` variable you defined before.
-If you want to be more specific about what to execute, you can always redefine it to whatever your needs are.
-
-
-For example:
-
-
-```php
-protected function beginOfAssociationChain()
-{
-    return Book::published()->where('library', 'NYC');
-}
-```
-
-Here your chain will always execute before anything the `published()` scope, and also will filter books showing only the ones at the NYC library.
-
-Then of course you will still be calling `$this->collection()` as previously described:
-
-```php
-$items = $this->collection()->get();
-$items = $this->collection()->paginate(static::PER_PAGE);
-
-```
-
-# Applying scopes manually
-
-We provide the function `applyScopes($query)` in case you want to manually apply your scopes to a query. As always, which scope will be triggered is function of current URL parameters.
-
-```php
-
-// Controller function
-public function index()
-{
-    $items = $this->applyScopes(Book::query())->get();
-}
-
-```
 
 ## Check if any filter is present
 
