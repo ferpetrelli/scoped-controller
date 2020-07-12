@@ -1,6 +1,6 @@
-# ScopedController
+# Scoped Controller
 
-ScopedController is a Laravel package that will allows you to execute scopes over an Eloquent model depending on the parameters you are receiving on the URL.
+Scoped Controller is a Laravel package that will allow you to cleanup your controllers by executing scopes dynamically over a collection, depending on which URL parameters are present.
 
 Inspired on the Ruby on Rails gem [Has Scope](https://github.com/plataformatec/has_scope).
 
@@ -23,13 +23,24 @@ And run `composer update`.
 
 # Usage
 
-Let's imagine we have a `Book` model and we want to create a filter for them.
+Imagine we have a `Book` model, and we want to use scopes as filters for a listing.
 
 1. Create your controller and be sure to inherit from `Petrelli\ScopedController\BaseController`.
 
-2. Define the `$scopes` variable as an Array following the pattern `[ URLparameter => scopeName, .... ]`
+2. Define which class will hold your collection with the `$entity` variable. Usually an Eloquent Model, but could be any class that respond to scopes.
 
 ```php
+protected $entity = Book::class;
+```
+
+3. Now define the `$scopes` variable as an Array following the pattern `[ URLparameter => scopeName, .... ]`
+
+```php
+
+use Petrelli\ScopedController\BaseController;
+
+class EventsController extends BaseController {
+
 // Here as an example we have two scopes: year and author.
 // They will be called if we receive the parameters
 // byYear and byAuthor respectively.
@@ -37,15 +48,12 @@ protected $scopes = [
     'byYear'   => 'year',
     'byAuthor' => 'author',
 ];
+
+}
 ```
 
-3. Define your `$entity` variable. Usually an Eloquent Model.
-
-```php
-protected $entity = Book::class;
-```
-
-4. Get the collection and perform the call. You can use any of the available functions for your chain. If using Eloquent, you could use `get()`, or `paginate(...)`.
+4. Now to get a filtered collection simply call `$this->collection()`.
+You can use any available function. If using Eloquent, you could use `get()`, `paginate(...)`, or anything you need to chain.
 
 ```php
 $items = $this->collection()->get();
@@ -55,13 +63,13 @@ $items = $this->collection()->paginate(static::PER_PAGE);
 
 ## In action
 
-This setup will work the following way:
+Scopes will be triggered by URL presence.
 
 ```
-# Get books filtered by year = 2018
-/books?byYear=2018
+# Get books filtered by year == 2020
+/books?byYear=2020
 
-# Get books filtered by author = cortazar
+# Get books filtered by author == cortazar
 /books?byAuthor=cortazar
 
 # Get books filtered by year and author
@@ -90,7 +98,7 @@ protected $scopes = [
 Defining the scope as an array will allow you to pass multiple parameters to it coming from the URL as arrays.
 
 
-## In action
+## Multi-value scopes in action
 
 
 ```
@@ -114,9 +122,11 @@ Of course you can generalize to use any number of parameters. Simply add it to t
 
 
 
-## Redefine the chain
+# Customizing the scopes chain
 
-If you want to be more specific about where to execute your scopes you can always redefine  `beginOfAssociationChain()`.
+We provide a controller function named  `beginOfAssociationChain()` that you could overload.
+In there we basically apply all scopes into the `$entity` variable you defined before.
+If you want to be more specific about what to execute, you can always redefine it to whatever your needs are.
 
 
 For example:
@@ -131,7 +141,7 @@ protected function beginOfAssociationChain()
 
 Here your chain will always execute before anything the `published()` scope, and also will filter books showing only the ones at the NYC library.
 
-Then of course just use `get` or `paginate` as usual:
+Then of course you will still be calling `$this->collection()` as previously described:
 
 ```php
 $items = $this->collection()->get();
@@ -139,9 +149,9 @@ $items = $this->collection()->paginate(static::PER_PAGE);
 
 ```
 
-## Applying scopes manually
+# Applying scopes manually
 
-You can always apply all scopes manually if you want better control:
+We provide the function `applyScopes($query)` in case you want to manually apply your scopes to a query. As always, which scope will be triggered is function of current URL parameters.
 
 ```php
 
@@ -153,9 +163,9 @@ public function index()
 
 ```
 
-## Check if there's a filter present
+## Check if any filter is present
 
-Usually for SEO you want to check if you have any scope present. There's a very simple function for this:
+Common use case, if you need to check if any scope is present:
 
 ```php
 
@@ -164,11 +174,9 @@ $this->hasAnyScope()
 
 ```
 
-## Use specific scopes for different actions
+# Use specific scopes for different actions
 
-As the result is a Query Builder, you could keep chaining methods and scopes as you would normally do with Eloquent.
-
-Let's take the following two controller actions:
+Because `$this->collection()` is returning a Query Builder (when using Eloquent for example), you could keep chaining methods and scopes as you would normally do:
 
 
 ```php
